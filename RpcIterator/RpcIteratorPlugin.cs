@@ -15,7 +15,7 @@ namespace Neo.Plugins
         protected override void Configure()
         {
             settings = new Settings(GetConfiguration());
-            foreach (RpcServerSettings s in settings.Servers)
+            foreach (RpcIteratorSettings s in settings.Servers)
                 if (servers.TryGetValue(s.Network, out IteratorServer server))
                     server.UpdateSettings(s);
         }
@@ -29,7 +29,7 @@ namespace Neo.Plugins
 
         protected override void OnSystemLoaded(NeoSystem system)
         {
-            RpcServerSettings s = settings.Servers.FirstOrDefault(p => p.Network == system.Settings.Network);
+            RpcIteratorSettings s = settings.Servers.FirstOrDefault(p => p.Network == system.Settings.Network);
             if (s is null) return;
 
             IteratorServer server = new(system, s);

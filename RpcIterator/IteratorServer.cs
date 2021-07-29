@@ -26,11 +26,11 @@ namespace Neo.Plugins
         private readonly Dictionary<string, Func<JArray, JObject>> methods = new Dictionary<string, Func<JArray, JObject>>();
 
         private IWebHost host;
-        private RpcServerSettings settings;
+        private RpcIteratorSettings settings;
         private readonly NeoSystem system;
         private readonly LocalNode localNode;
 
-        public IteratorServer(NeoSystem system, RpcServerSettings settings)
+        public IteratorServer(NeoSystem system, RpcIteratorSettings settings)
         {
             this.system = system;
             this.settings = settings;
@@ -140,7 +140,7 @@ namespace Neo.Plugins
             host.Start();
         }
 
-        internal void UpdateSettings(RpcServerSettings settings)
+        internal void UpdateSettings(RpcIteratorSettings settings)
         {
             this.settings = settings;
         }
@@ -220,9 +220,9 @@ namespace Neo.Plugins
             {
                 string method = request["method"].AsString();
                 if (!CheckAuth(context) || settings.DisabledMethods.Contains(method))
-                    throw new IteratorException(-400, "Access denied");
+                    throw new RpcException(-400, "Access denied");
                 if (!methods.TryGetValue(method, out var func))
-                    throw new IteratorException(-32601, "Method not found");
+                    throw new RpcException(-32601, "Method not found");
                 response["result"] = func((JArray)request["params"]);
                 return response;
             }
@@ -248,7 +248,7 @@ namespace Neo.Plugins
         {
             foreach (MethodInfo method in handler.GetType().GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
-                IteratorMethodAttribute attribute = method.GetCustomAttribute<IteratorMethodAttribute>();
+                RpcMethodAttribute attribute = method.GetCustomAttribute<RpcMethodAttribute>();
                 if (attribute is null) continue;
                 string name = string.IsNullOrEmpty(attribute.Name) ? method.Name.ToLowerInvariant() : attribute.Name;
                 methods[name] = (Func<JArray, JObject>)method.CreateDelegate(typeof(Func<JArray, JObject>), handler);
