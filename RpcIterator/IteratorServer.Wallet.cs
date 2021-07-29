@@ -1,20 +1,11 @@
-using Akka.Actor;
 using Neo.IO;
 using Neo.IO.Json;
 using Neo.Network.P2P.Payloads;
-using Neo.Persistence;
 using Neo.SmartContract;
-using Neo.SmartContract.Native;
-using Neo.VM;
 using Neo.Wallets;
-using Neo.Wallets.NEP6;
-using Neo.Wallets.SQLite;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Numerics;
-using static System.IO.Path;
 
 namespace Neo.Plugins
 {
@@ -39,7 +30,6 @@ namespace Neo.Plugins
 
         protected Wallet wallet;
 
-     
         private void ProcessInvokeWithWallet(JObject result, Signers signers = null)
         {
             if (wallet == null || signers == null) return;
@@ -70,8 +60,6 @@ namespace Neo.Plugins
                 result["pendingsignature"] = context.ToJson();
             }
         }
-
-    
 
         internal static UInt160 AddressToScriptHash(string address, byte version)
         {

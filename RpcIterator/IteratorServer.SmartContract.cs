@@ -5,10 +5,8 @@ using Neo.Network.P2P.Payloads;
 using Neo.Persistence;
 using Neo.SmartContract;
 using Neo.SmartContract.Iterators;
-using Neo.SmartContract.Native;
 using Neo.VM;
 using Neo.VM.Types;
-using Neo.Wallets;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -60,23 +58,6 @@ namespace Neo.Plugins
             }
         }
 
-        //private static JObject ToJson(StackItem item, int max)
-        //{
-        //    JObject json = item.ToJson();
-        //    if (item is InteropInterface interopInterface && interopInterface.GetInterface<object>() is IIterator iterator)
-        //    {
-        //        JArray array = new();
-        //        while (max > 0 && iterator.Next())
-        //        {
-        //            array.Add(iterator.Value().ToJson());
-        //            max--;
-        //        }
-        //        json["iterator"] = array;
-        //        json["truncated"] = iterator.Next();
-        //    }
-        //    return json;
-        //}
-
         private static Signers SignersFromJson(JArray _params, ProtocolSettings settings)
         {
             var ret = new Signers(_params.Select(u => new Signer()
@@ -102,13 +83,10 @@ namespace Neo.Plugins
             };
 
             // Validate format
-
             _ = IO.Helper.ToByteArray(ret.GetSigners()).AsSerializableArray<Signer>();
 
             return ret;
         }
-
-        //===========
 
         [IteratorMethod]
         protected virtual JObject InvokeIterator(JArray _params)
@@ -139,10 +117,9 @@ namespace Neo.Plugins
             List<object> resultList = new();
             try
             {
-                var result = engine.ResultStack.FirstOrDefault() as VM.Types.InteropInterface;
-                if (result is null)
+                if (engine.ResultStack.FirstOrDefault() is not InteropInterface result)
                 {
-                    json["result"] = null;
+                    json["stack"] = null;
                 }
                 else
                 {
@@ -152,7 +129,7 @@ namespace Neo.Plugins
                         if (i >= startIndex && i < endIndex)
                             resultList.Add(iterator.Value());
                     }
-                    json["result"] = new JArray(resultList.Select(p => ((VM.Types.StackItem)p).ToJson()));
+                    json["stack"] = new JArray(resultList.Select(p => ((StackItem)p).ToJson()));
                 }
             }
             catch (InvalidOperationException)
@@ -166,8 +143,6 @@ namespace Neo.Plugins
 
             return json;
         }
-
-      
 
         static string GetExceptionMessage(Exception exception)
         {

@@ -23,7 +23,7 @@ namespace Neo.Plugins
 {
     public partial class IteratorServer : IDisposable
     {
-        private readonly Dictionary<string, Func<JArray, JObject>> methods = new Dictionary<string, Func<JArray, JObject>>();
+        private readonly Dictionary<string, Func<JArray, JObject>> methods = new();
 
         private IWebHost host;
         private RpcServerSettings settings;
