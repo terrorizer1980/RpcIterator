@@ -88,7 +88,7 @@ namespace Neo.Plugins
             return ret;
         }
 
-        [IteratorMethod]
+        [RpcMethod]
         protected virtual JObject InvokeIterator(JArray _params)
         {
             UInt160 script_hash = UInt160.Parse(_params[0].AsString());

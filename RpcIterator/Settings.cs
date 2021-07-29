@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Neo.SmartContract.Native;
 using System;
 using System.Collections.Generic;
@@ -9,15 +9,15 @@ namespace Neo.Plugins
 {
     class Settings
     {
-        public IReadOnlyList<RpcServerSettings> Servers { get; }
+        public IReadOnlyList<RpcIteratorSettings> Servers { get; }
 
         public Settings(IConfigurationSection section)
         {
-            Servers = section.GetSection(nameof(Servers)).GetChildren().Select(p => RpcServerSettings.Load(p)).ToArray();
+            Servers = section.GetSection(nameof(Servers)).GetChildren().Select(p => RpcIteratorSettings.Load(p)).ToArray();
         }
     }
 
-    public record RpcServerSettings
+    public record RpcIteratorSettings
     {
         public uint Network { get; init; }
         public IPAddress BindAddress { get; init; }
@@ -33,7 +33,7 @@ namespace Neo.Plugins
         public int MaxIteratorResultItems { get; init; }
         public string[] DisabledMethods { get; init; }
 
-        public static RpcServerSettings Default { get; } = new RpcServerSettings
+        public static RpcIteratorSettings Default { get; } = new RpcIteratorSettings
         {
             Network = 5195086u,
             BindAddress = IPAddress.None,
@@ -47,7 +47,7 @@ namespace Neo.Plugins
             MaxConcurrentConnections = 40,
         };
 
-        public static RpcServerSettings Load(IConfigurationSection section) => new()
+        public static RpcIteratorSettings Load(IConfigurationSection section) => new()
         {
             Network = section.GetValue("Network", Default.Network),
             BindAddress = IPAddress.Parse(section.GetSection("BindAddress").Value),
